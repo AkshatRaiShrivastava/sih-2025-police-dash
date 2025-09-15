@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, Navigate } from "react-router-dom"
 import { motion } from "framer-motion"
+import dynamic from "next/dynamic"
 import {
   Shield,
   AlertTriangle,
@@ -25,6 +26,12 @@ import {
   Moon,
   ChevronRight,
   CheckCircle,
+  Mail,
+  Phone,
+  IdCard,
+  User2,
+  Plus,
+  PhoneCall,
 } from "lucide-react"
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 
@@ -115,7 +122,7 @@ const responseTimeData = [
   { month: "Jun", time: 8.0 },
 ]
 
-export default function PoliceDashboard() {
+function PoliceDashboard() {
   const [darkMode, setDarkMode] = useState(true)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [useFirestore, setUseFirestore] = useState(false)
@@ -192,6 +199,7 @@ export default function PoliceDashboard() {
                   }
                 />
                 <Route path="/map" element={<MapPage />} />
+                <Route path="/tourist" element={<TouristData />} />
                 <Route path="/resources" element={<ResourcesPage officers={officers} />} />
                 <Route
                   path="/reports"
@@ -207,6 +215,8 @@ export default function PoliceDashboard() {
   )
 }
 
+export default dynamic(() => Promise.resolve(PoliceDashboard), { ssr: false })
+
 function Sidebar({ collapsed, onToggle }) {
   const location = useLocation()
 
@@ -215,6 +225,7 @@ function Sidebar({ collapsed, onToggle }) {
     { path: "/alerts", icon: AlertTriangle, label: "Live Alerts", badge: 3 },
     { path: "/incidents", icon: FileText, label: "Incidents", badge: null },
     { path: "/map", icon: Map, label: "Map View", badge: null },
+    { path: "/tourist", icon: Users, label: "Tourist Data", badge: null },
     { path: "/resources", icon: Users, label: "Resources", badge: null },
     { path: "/reports", icon: BarChart3, label: "Reports", badge: null },
     { path: "/settings", icon: Settings, label: "Settings", badge: null },
@@ -411,6 +422,70 @@ function StatCard({ title, value, icon: Icon, color }) {
         <Icon className={`w-8 h-8 ${color}`} />
       </div>
     </motion.div>
+  )
+}
+
+function TouristData() {
+  const contacts = [
+    { id: 1, name: "John Doe", relation: "Brother", phone: "+91 9876543210" },
+    { id: 2, name: "Jane Smith", relation: "Friend", phone: "+91 8765432109" },
+  ]
+
+  const InfoRow = ({ icon: Icon, label, value }) => (
+    <div className="flex items-center justify-between rounded-lg bg-muted p-3">
+      <div className="flex items-center space-x-3">
+        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+          <Icon className="h-4 w-4 text-primary" />
+        </div>
+        <span className="text-sm text-muted-foreground">{label}:</span>
+      </div>
+      <span className="text-sm font-medium">{value}</span>
+    </div>
+  )
+
+  return (
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold">Tourist Data</h2>
+
+      <div className="space-y-3 bg-card border border-border rounded-lg p-6">
+        <h3 className="text-lg font-semibold mb-2">Personal Information</h3>
+        <InfoRow icon={User2} label="Name" value="akshat" />
+        <InfoRow icon={Mail} label="Email" value="abcd@gmail.com" />
+        <InfoRow icon={Phone} label="Mobile" value="0123456789" />
+        <InfoRow icon={IdCard} label="ID Number" value="0123456789" />
+      </div>
+
+      <div className="space-y-3 bg-card border border-border rounded-lg p-6">
+        <h3 className="text-lg font-semibold">Emergency Contacts</h3>
+        <div className="space-y-3">
+          {contacts.map((c) => (
+            <div key={c.id} className="flex items-center justify-between rounded-lg bg-muted p-3">
+              <div>
+                <p className="text-sm font-medium">{c.name}</p>
+                <p className="text-xs text-muted-foreground">{c.relation} • {c.phone}</p>
+              </div>
+              <button className="p-2 rounded hover:bg-sidebar-accent">
+                <PhoneCall className="h-5 w-5" />
+              </button>
+            </div>
+          ))}
+        </div>
+        <button className="mt-2 px-4 py-2 border rounded-lg text-sm inline-flex items-center">
+          <Plus className="h-4 w-4 mr-2" /> Add Contact
+        </button>
+      </div>
+
+      <div className="bg-card border border-border rounded-lg p-6">
+        <h3 className="text-lg font-semibold mb-2">Settings</h3>
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="font-medium">Location Sharing</p>
+            <p className="text-sm text-muted-foreground">Share location with emergency contacts</p>
+          </div>
+          <input type="checkbox" defaultChecked className="h-5 w-5" />
+        </div>
+      </div>
+    </div>
   )
 }
 
